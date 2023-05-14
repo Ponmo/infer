@@ -456,7 +456,7 @@ window.onload = function() {
             // HANDLE ERRORS HERE
         }
     }
-    optionsRequest.open("GET", "http://127.0.0.1:8000/get_options", true);
+    optionsRequest.open("GET", "https://octobazooka.store/get_options", true);
     optionsRequest.send();
 
 
@@ -613,7 +613,7 @@ window.onload = function() {
             }
             textArea.disabled = false;
         }
-        proxyInferenceRequest.open("POST", "http://127.0.0.1:8000/proxy_inference", true);
+        proxyInferenceRequest.open("POST", "https://octobazooka.store/proxy_inference", true);
         proxyInferenceRequest.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         proxyInferenceRequest.setRequestHeader("Accept", "application/json");
         data = null;
