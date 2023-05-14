@@ -56,7 +56,7 @@ def home(request):
 def upload(request):
     return render(request, 'api/upload.html')
 
-@csrf_exempt #temporarily
+# @csrf_exempt #temporarily
 @api_view(['POST'])
 def register_api(request):
     if registered_apis.count_documents({'url': request.data['url']}, limit = 1) > 0:
