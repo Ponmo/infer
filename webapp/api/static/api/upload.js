@@ -18,7 +18,7 @@ $(document).ready(function() {
                 // $("#output").text(data['results']);
             },
             error: function(xhr, status, error) {
-                alert(JSON.parse(xhr.responseText)['error']);
+                alert(JSON.parse(xhr.responseText));
             }
         });
     });

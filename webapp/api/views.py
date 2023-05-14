@@ -131,7 +131,7 @@ def proxy_inference(request):
         data = {"inputs": request.data['content']}
 
     if data_type == 'image':
-        if len(request.data['content']) > 300:
+        if len(request.data['content']) > 200:
             return JsonResponse({"error": "Image too large (base64?)"}, safe=False, status=status.HTTP_400_BAD_REQUEST)
         data = {"inputs": request.data['content']}
 
