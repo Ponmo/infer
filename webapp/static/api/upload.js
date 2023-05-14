@@ -1,6 +1,7 @@
 $(document).ready(function() {
     $('#submit').click(function() {
-        // alert('wow');
+        $("#input-area").css("border", "0px"); 
+        $("#input-area").css("background-color", "white"); 
         $.ajax({
             type: "POST",
             url: "/register_api",

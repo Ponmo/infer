@@ -98,16 +98,18 @@ def proxy_inference(request):
 
     if custom_model:
         try:
-            data = requests.post(custom_model, data={'inputs': request.data['content']})
-            cache.set(str(request.data), data)
-            return JsonResponse(data.text, safe=False, status=status.HTTP_200_OK)
+            if (re.match(valid_url, custom_model) is not None):
+                data = requests.post(custom_model, data={'inputs': request.data['content']})
+                cache.set(str(request.data), data.text)
+                return JsonResponse(data.text, safe=False, status=status.HTTP_200_OK)
         except Exception:
             return JsonResponse({"error": "Custom model did not work..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
+        return JsonResponse({"error": "Custom model is not a valid link..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
     if model.startswith('http'):
         try:
             data = requests.post(model, data={'inputs': request.data['content']})
-            cache.set(str(request.data), data)
+            cache.set(str(request.data), data.text)
             return JsonResponse(data.text, safe=False, status=status.HTTP_200_OK)
         except Exception:
             registered_apis.delete_one({'url': model})

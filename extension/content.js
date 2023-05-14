@@ -76,10 +76,11 @@ window.onload = function() {
     .box_hide > .header,
     .box_hide > .boy,
     .box_hide > .modelTypeSelection,
-    .box_hide > .close
-    .box_hide > .videoLink
-    .box_hide > .output {
-        display: none;
+    .box_hide > .close,
+    .box_hide > .videoLink,
+    .box_hide > .output,
+    .box_hide > .loader {
+        display: none !important;
     }
     .box_show > #logo {
         display: none;
@@ -203,7 +204,6 @@ window.onload = function() {
         display: none;
     }
     .loader {
-        display: none;
         margin: auto;
         width: 48px;
         height: 48px;
@@ -216,7 +216,7 @@ window.onload = function() {
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        border: 2px solid orange;
+        border: 2px solid cyan;
         position: absolute;
         left: 0;
         top: 0;
@@ -329,8 +329,16 @@ window.onload = function() {
     #custom {
         margin-bottom:4px;
     }
-    .setting {
-
+    .settings {
+        font-size: 14px;
+    padding-left: 3px;
+    margin-top: 18px;
+    cursor:pointer;
+    }
+    .store {
+        font-size: 18px;
+        padding-left: 4px;
+        margin-top: 11px;
     }
     `;
 
@@ -357,7 +365,11 @@ window.onload = function() {
 
     const setting = document.createElement("div");
     setting.setAttribute("class", "settings");
-    setting.textContent = "Settings";
+    setting.textContent = ".store";
+
+    const store = document.createElement("div");
+    store.setAttribute("class", "store");
+    store.textContent = "⚙︎";
 
 
     const videoLink = document.createElement("div");
@@ -400,6 +412,7 @@ window.onload = function() {
     header.append(logo2);
     header.append(title);
     header.append(setting);
+    header.append(store);
     header.appendChild(closeBtn);
 
 
@@ -583,20 +596,19 @@ window.onload = function() {
     send.addEventListener('click', function handleClick(e) {
         console.log("hello");
         output.style.display = "none";
-        loader.style.display = "inline-block";
+        loader.style.display = "block";
         textArea.disabled = true;
         let proxyInferenceRequest = new XMLHttpRequest();
         proxyInferenceRequest.onreadystatechange = function() {
             if (this.readyState == 4 && (this.status == 200 || this.status == 400)) {
                 console.log(proxyInferenceRequest.responseText);
                 output.textContent = proxyInferenceRequest.responseText;
-                output.style.display = "block";
-                loader.style.display = "none";
                 // if (JSON.parse(proxyInferenceRequest.responseText)["misinfo"]);
+                loader.style.display = "none";
+                output.style.display = "block";
+
             }
             else {
-                output.style.display = "block";
-                loader.style.display = "none";
                 // HANDLE ERRORS HERE, USUALLY WAITING FOR MODEL TO SPIN UP 20 SECONDS
             }
             textArea.disabled = false;
@@ -633,10 +645,10 @@ window.onload = function() {
         //     dataType = 'community';
         // }
         let shown = null;
-        if (textModels.includes(currentModelType)) {
+        if (dataType == 'text') {
             shown = textModels;
         }
-        else if (imageModels.includes(currentModelType)) {
+        else if (dataType == 'image') {
             shown = imageModels;
         }
         else {
