@@ -9,3 +9,12 @@ main > :last-child {
   margin-top: min(10vmax, 10rem);
   margin-bottom: min(10vmax, 10rem);
 } */
+
+.inferWrapper {
+    z-index: 40000000;
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    height: 0px;
+    width: 0px;
+}

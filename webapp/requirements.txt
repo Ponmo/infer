@@ -21,3 +21,7 @@ requests
 # Pillow
 # apex
 # functorch
+huggingface_hub
+redis
+redis-cli
+psutil
