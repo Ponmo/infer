@@ -1,3 +1,5 @@
+__OCTOBAZOOKA__
+
 **Using the Extension:**
 
 Clone the project locally. Then, go to the Extensions Manager page of Chrome. Turn on developer mode in the top right corner. Press Load Unpacked, and select the extension folder.
