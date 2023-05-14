@@ -6,7 +6,9 @@ Clone the project locally. Then, go to the Extensions Manager page of Chrome. Tu
 **Keyboard Commands:**
 
 Ctrl+D = Selects the text that you have highlighted.
+
 Cmd+Shft+RightClick = Select image.
+
 Cmd+Option+RightClick = Select video.
 
 
