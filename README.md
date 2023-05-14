@@ -3,9 +3,11 @@ Use the Extension:
 Clone the project locally. Then, go to the Extensions Manager page of Chrome. Turn on developer mode in the top right corner. Press Load Unpacked, and select the extension folder.
 
 Commands:
-Ctrl+A = I don't know
+Ctrl+D = Selects the text that you have highlighted.
+Cmd+Shft+RightClick = Select image.
+Cmd+Option+RightClick = Select video.
 
-Test Your Inference (image-to-text and text-to-text only):
+Test Your Inference (video-to-text, image-to-text, and text-to-text only for now, but thousands of models on hugging face can all be registered!):
 
 Set up your own inference accessible through a REST API. Accept POST requests from "mydomain.com" and expect JSON in this format:
 {'inputs': 'I am text, or an image source, or a video link.'}
