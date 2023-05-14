@@ -1,4 +1,5 @@
 ## OCTOBAZOOKA
+By Noah and Ramon Wang
 
 **Using the Extension:**
 
