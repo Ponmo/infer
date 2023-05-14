@@ -153,7 +153,9 @@ def proxy_inference(request):
         except HTTPError as e:
             return JsonResponse({"error": e.response.text}, safe=False, status=status.HTTP_400_BAD_REQUEST)
         
-    cache.set(str(request.data), json.loads(response.content.decode("utf-8")))
+    if ("error" not in json.loads(response.text)):
+        print('cached')
+        cache.set(str(request.data), json.loads(response.content.decode("utf-8")))
 
     return JsonResponse(json.loads(response.content.decode("utf-8")), safe=False, status=status.HTTP_200_OK)
 

@@ -27,3 +27,4 @@ redis-cli
 psutil
 pymongo==3.11
 dnspython
+django-allauth
