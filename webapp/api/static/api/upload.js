@@ -5,7 +5,7 @@ $(document).ready(function() {
         $.ajax({
             type: "POST",
             url: "/register_api",
-            data: {'url': $('#input-area').val()},
+            data: {csrfmiddlewaretoken: "{{ csrf_token }}", 'url': $('#input-area').val()},
             success: function(data, textStatus, xhr) {
                 $("#input-area").css("border", "2px solid green"); 
                 $("#input-area").css("background-color", "#edfff1"); 
