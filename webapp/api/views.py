@@ -20,9 +20,7 @@ from huggingface_hub.inference_api import InferenceApi
 from pymongo.mongo_client import MongoClient
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views.decorators.http import require_http_methods
-
+from django.views.decorators.csrf import csrf_exempt
 
 
 MONGO_URI = "mongodb+srv://second:" + os.environ.get('MONGO_PASSWORD') + "@mycluster.pgus5.mongodb.net/?retryWrites=true&w=majority"
@@ -51,14 +49,12 @@ ASSEMBLY_TOKEN = os.environ.get('ASSEMBLY_TOKEN')
 ASSEMBLY_TRANSCRIPT_ENDPOINT = "https://api.assemblyai.com/v2/transcript"
 
 @cache_page(60 * 24)
-@ensure_csrf_cookie()
-@require_http_methods(["GET"])
+# @ensure_csrf_cookie()
 def home(request):
     return render(request, 'api/home.html')
 
 @cache_page(60 * 24)
-@ensure_csrf_cookie()
-@require_http_methods(["GET"])
+# @ensure_csrf_cookie()
 def upload(request):
     return render(request, 'api/upload.html')
 
