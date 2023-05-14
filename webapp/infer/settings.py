@@ -25,9 +25,6 @@ SECRET_KEY = 'django-insecure-kz4@we6mw6(*n+j*5ppmzkc3)#*0)x+5l6xk@+9wy5(k1i%)+0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -175,3 +172,5 @@ SOCIALACCOUNT_PROVIDERS = {
 SITE_ID = 3
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000,', 'https://octobazooka.store']
