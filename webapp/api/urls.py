@@ -10,6 +10,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name="index.html")),
     path("get_options", views.get_options, name='get_options'),
     path("register_api", views.register_api, name='register_api'),
-    path("", include("allauth.urls"))
+    path("", include("allauth.urls")),
+    path('logout', LogoutView.as_view()),
     # path("hugging_inference", views.hugging_inference, name="hugging_inference"),
 ]

@@ -21,7 +21,11 @@
                 <div class="headerLink"><a href="">Leaderboards</a></div>
                 <div class="headerLink"><a href="">Extensions</a></div>
                 <div class="headerLink"><a href="/upload">API</a></div>
-                <div class="headerLink"><a href="">Logout</a></div>
+                {% if user.is_authenticated %}
+                <div class="headerLink"><a href="/logout">Logout</a></div>
+                {% else %}
+                <div class="headerLink"><a href="{% provider_login_url 'google' %}">Login</a></div>
+                {% endif %}
             </div>
         </div>
         <div class="center">
@@ -31,3 +35,5 @@
         <img class="main-image" src="{% static 'api/images/background.png' %}">
     </body>
 </html>
+
+{% csrf_token %}
