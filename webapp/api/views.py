@@ -56,8 +56,8 @@ def home(request):
 def upload(request):
     return render(request, 'api/upload.html')
 
-# @csrf_exempt #temporarily
 @api_view(['POST'])
+@csrf_exempt #temporarily
 def register_api(request):
     if registered_apis.count_documents({'url': request.data['url']}, limit = 1) > 0:
         return JsonResponse({"error": "Already registered"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)
