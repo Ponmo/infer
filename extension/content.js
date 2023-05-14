@@ -17,6 +17,32 @@ window.onload = function() {
     
     //TODO: MUST INCLUDE LOGO ICON IN BOTTOM RIGHT CORNER + BACKGROUND PICTURE WITH ANIMATION.
     style.textContent = `
+    select {  
+        background-color:#1F99CD;
+        background-image: url(~"data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20448%22%20enable-background%3D%22new%200%200%20256%20448%22%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E.arrow%7Bfill%3A@{arrow}%3B%7D%3C%2Fstyle%3E%3Cpath%20class%3D%22arrow%22%20d%3D%22M255.9%20168c0-4.2-1.6-7.9-4.8-11.2-3.2-3.2-6.9-4.8-11.2-4.8H16c-4.2%200-7.9%201.6-11.2%204.8S0%20163.8%200%20168c0%204.4%201.6%208.2%204.8%2011.4l112%20112c3.1%203.1%206.8%204.6%2011.2%204.6%204.4%200%208.2-1.5%2011.4-4.6l112-112c3-3.2%204.5-7%204.5-11.4z%22%2F%3E%3C%2Fsvg%3E%0A");
+        background-position: right 10px center;
+        background-repeat: no-repeat;
+        background-size: auto 50%;
+        border-radius:2px;
+        border:none;
+        color: #ffffff;
+        padding: 10px 20px 10px 10px;
+        // disable default appearance
+        outline: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        &::-ms-expand { display: none };
+      }
+      
+      // remove dotted firefox border
+      @-moz-document url-prefix() {
+        select {
+          color: rgba(0,0,0,0);
+          text-shadow: 0 0 0 #ffffff;
+        }
+      }
+
     #logo {
         content:url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/logo.png');
         height: 50px;
@@ -56,7 +82,6 @@ window.onload = function() {
         color: black;
         display: flex;
         flex-direction: column;
-        background-image: url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/background.png');
         background-repeat: no-repeat;
         font-family: Arial, sans-serif;
         visibility: visible;
@@ -77,6 +102,23 @@ window.onload = function() {
     @-webkit-keyframes fadeIn {
         from {opacity: 0;}
         to {opacity: 1;}
+    }
+    input {
+        line-height: 22px;
+    padding: 0px 14px;
+    width: 100%;
+    min-height: 44px;
+    border: unset;
+    border-radius: 4px;
+    outline-color: rgb(84 105 212 / 0.5);
+        background-color: #1F99CD;
+        box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
+                    rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
+                    rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
+                    rgba(60, 66, 87, 0.16) 0px 0px 0px 1px, 
+                    rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
+                    rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
+                    rgba(0, 0, 0, 0) 0px 0px 0px 0px;
     }
     
     @keyframes fadeIn {
@@ -122,10 +164,8 @@ window.onload = function() {
     }
     .titular {
         padding-left: 8px;
-        background: linear-gradient(to bottom right, black, orange, cyan);
-        background: -webkit-linear-gradient(to bottom right, orange, cyan);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-size: 24px;
+        color: black;
     }
     ::-webkit-scrollbar {
         width: 4px;
@@ -237,15 +277,17 @@ window.onload = function() {
     }
     #model {
         margin-bottom: 4px;
-        display: block;
-        max-width: 330px;
-        margin: auto;
+        width: 293px;
     }
     #modelType {
         margin-bottom: 4px;
     }
     #api {
-        margin-bottom: 4px;
+        width: 312px;
+    margin: auto;
+    color: white;
+    margin-bottom: 4px;
+    background-color: #1F99CD;
     }
     .output {
         margin-top: 12px;
@@ -261,6 +303,9 @@ window.onload = function() {
         font-size: 16px;
         overflow-y: scroll;
         overflow-x: hidden;
+    }
+    #custom {
+        margin-bottom:4px;
     }
     `;
 
@@ -289,7 +334,7 @@ window.onload = function() {
     videoLink.setAttribute("class", "videoLink_2");
 
     const modelTypeSelection = document.createElement("div");
-    modelTypeSelection.innerHTML = '<label for="modelType">Model Type:</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select> <label for="model">Model:</label><select name="model" id="model"></select><label for="name">REST API:</label><input type="text" id="api" name="api">';
+    modelTypeSelection.innerHTML = '<label for="modelType">Model Type:</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select><br><label for="model">Model:</label><select name="model" id="model"></select><label for="name" id="custom">Custom:</label><input placeholder="Input your own Developer REST API" type="text" id="api" name="api">';
     modelTypeSelection.setAttribute("class", "modelTypeSelection");
 
     const boy = document.createElement("div");

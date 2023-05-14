@@ -6,13 +6,12 @@
         <title>Infer</title>
         <link rel="stylesheet" href="{% static 'api/upload.css' %}">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <!-- <script type="text/javascript" src="{% static 'firstapp/script.js' %}"></script> -->
+        <script type="text/javascript" src="{% static 'api/upload.js' %}"></script>
     </head>
     <body>
         <!-- <img id="background" src="{% static 'firstapp/images/back.png' %}"> -->
         <div class="header">
             <div class="headerLeft">
-                <!-- <img class="logo-white" src="{% static 'firstapp/images/logowhite.svg' %}"> -->
                 <div class="name"><a href="/">Infer</a></div>
             </div>
 
@@ -34,9 +33,8 @@
                 <div class="box__success">Done!</div>
                 <div class="box__error">Error! <span></span>.</div>
               </form>
-              <!-- <div class="register">Or register your API endpoint (instructions):</div> -->
               <div class="search">
-                <textarea name="input" id="input-area" type = "text" placeholder="Or register your API endpoint here..."></textarea>
+                <textarea name="input" id="input-area" type = "text" placeholder="Or register your API endpoint..."></textarea>
                 <button id="submit">Register</button>
             </div>
         </div>

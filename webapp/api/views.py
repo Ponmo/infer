@@ -51,8 +51,8 @@ def home(request):
     return render(request, 'api/home.html')
 
 # @cache_page(60 * 24)
-def register(request):
-    return render(request, 'api/register.html')
+def upload(request):
+    return render(request, 'api/upload.html')
 
 @api_view(['POST'])
 def register_api(request): 
@@ -77,7 +77,7 @@ def proxy_inference(request):
     # if cached:
     #     return JsonResponse(cached, safe=False, status=status.HTTP_200_OK)
 
-    #dont cache custom, they might want to change the model as if they are testing
+    #dont cache custom or community, they might want to change the model
 
     # model = "microsoft/table-transformer-structure-recognition"
     model = request.data['model']
