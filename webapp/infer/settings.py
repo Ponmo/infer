@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'api.apps.ApiConfig',
     'rest_framework',
-    # 'corsheaders',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    # 'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'infer.urls'
@@ -135,14 +135,16 @@ ALLOWED_HOSTS = ['*']
 #     "*"
 # ]
 
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
-        "TIMEOUT": 86400,
-        # "OPTIONS": {
-        #     # "MAX_ENTRIES": 1000,
-        #     "CULL_FREQUENCY": 3,
-        # }
-    }
-}
+CORS_ALLOW_ALL_ORIGINS = True
+
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379",
+#         "TIMEOUT": 86400,
+#         # "OPTIONS": {
+#         #     # "MAX_ENTRIES": 1000,
+#         #     "CULL_FREQUENCY": 3,
+#         # }
+#     }
+# }

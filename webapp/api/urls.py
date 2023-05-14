@@ -6,5 +6,6 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("upload", views.upload, name="upload"),
     path("proxy_inference", views.proxy_inference, name="proxy_inference"),
+    path("get_options", views.get_options, name='get_options')
     # path("hugging_inference", views.hugging_inference, name="hugging_inference"),
 ]

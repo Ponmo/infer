@@ -24,7 +24,8 @@ options = {'fill_mask': ['gpt2'], #fill mask is weird because each one has a dif
            'text_classification': ['distilbert-base-uncased-finetuned-sst-2-english', 'cardiffnlp/twitter-roberta-base-sentiment-latest', 'madhurjindal/autonlp-Gibberish-Detector-492513457'],
            'image_to_text_description': ['nlpconnect/vit-gpt2-image-captioning', 'Salesforce/blip-image-captioning-base', 'Salesforce/blip-image-captioning-large'],
            'image_to_text_transcribe': ['microsoft/trocr-base-printed', 'microsoft/trocr-small-handwritten', 'microsoft/trocr-large-handwritten', 'kha-white/manga-ocr-base'],
-           'object_detection': ['hustvl/yolos-tiny', 'hustvl/yolos-small', 'microsoft/table-transformer-detection', 'microsoft/table-transformer-structure-recognition', 'valentinafeve/yolos-fashionpedia']}
+           'object_detection': ['hustvl/yolos-tiny', 'hustvl/yolos-small', 'microsoft/table-transformer-detection', 'microsoft/table-transformer-structure-recognition', 'valentinafeve/yolos-fashionpedia'],
+           'video_to_text_transcribe': ['assembly-ai']}
 
 
 HUGGING_API_URL_BASE = "https://api-inference.huggingface.co/models/"
@@ -59,16 +60,22 @@ def proxy_inference(request):
     data = ''
 
     if data_type == 'video':
-        data = {"inputs": transcribe_video()} 
-        # data = {"inputs": transcribe_video(request.data['video'])}
+        try:
+            data = {"transcription": transcribe_video()}
+            # cache.set(str(request.data), data)
+            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+        except HTTPError as e:
+            return JsonResponse({"error": e.response.text}, safe=False, status=status.HTTP_400_BAD_REQUEST)
+
+        # data = {"inputs": transcribe_video(request.data['content'])}
 
     if data_type == 'text':
         data = {"inputs": "I hate it when you come home a "} 
-        # data = {"inputs": request.data['text']}
+        # data = {"inputs": request.data['content']}
 
     if data_type == 'image':
         data = {"inputs": "https://wordpress-live.heygrillhey.com/wp-content/uploads/2018/05/Smoked-Hamburgers-Feature-500x500.png"}
-        # data = {"inputs": request.data['image']}
+        # data = {"inputs": request.data['content']}
 
     # hugging_model = request.data['hugging'] #if request.data['hugging'] in options['text_generation'] else "gpt2"
     # proxy = request.data['proxy']
@@ -107,10 +114,31 @@ def proxy_inference(request):
     return JsonResponse(json.loads(response.content.decode("utf-8")), safe=False, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
-def get_inference_options(request):
+def get_options(request):
     # allow user to do their own huggingface name / their own api
     # Register their app with CORS ALLOWED ORIGINS our domain....
-    return JsonResponse({'options': options}, safe=False, status=status.HTTP_200_OK)
+    data = {
+        'fill_mask': ' '.join(options['fill_mask']),
+        'text_classification': ' '.join(options['text_classification']),
+        'image_to_text_description': ' '.join(options['image_to_text_description']),
+        'image_to_text_transcribe': ' '.join(options['image_to_text_transcribe']),
+        'object_detection': ' '.join(options['object_detection']),
+        'video_to_text_transcribe': ' '.join(options['video_to_text_transcribe'])
+    }
+    # 'fill_mask': ['gpt2'], #fill mask is weird because each one has a different mask token format.
+    #        'text_classification': ['distilbert-base-uncased-finetuned-sst-2-english', 'cardiffnlp/twitter-roberta-base-sentiment-latest', 'madhurjindal/autonlp-Gibberish-Detector-492513457'],
+    #        'image_to_text_description': ['nlpconnect/vit-gpt2-image-captioning', 'Salesforce/blip-image-captioning-base', 'Salesforce/blip-image-captioning-large'],
+    #        'image_to_text_transcribe': ['microsoft/trocr-base-printed', 'microsoft/trocr-small-handwritten', 'microsoft/trocr-large-handwritten', 'kha-white/manga-ocr-base'],
+    #        'object_detection': ['hustvl/yolos-tiny', 'hustvl/yolos-small', 'microsoft/table-transformer-detection', 'microsoft/table-transformer-structure-recognition', 'valentinafeve/yolos-fashionpedia']}
+
+
+    response = JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Max-Age"] = "1000"
+    response["Access-Control-Allow-Headers"] = "X-Requested-With, Content-Type"
+    return response
+    
 
 def transcribe_video(url='https://video.twimg.com/ext_tw_video/1379732959234826242/pu/vid/576x1082/7KzYeEtZMmYGK6bN.mp4'):
 
