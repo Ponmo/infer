@@ -11,14 +11,20 @@ import os
 import json
 import time
 import psutil
+import re
 
 from django.http import JsonResponse
 import requests
 from requests.exceptions import HTTPError
 from huggingface_hub.inference_api import InferenceApi
+from pymongo.mongo_client import MongoClient
 # from django.views.decorators.cache import cache_page
 # from django.core.cache import cache
 
+MONGO_URI = "mongodb+srv://second:" + os.environ.get('MONGO_PASSWORD') + "@mycluster.pgus5.mongodb.net/?retryWrites=true&w=majority"
+MONGO_CLIENT = MongoClient(MONGO_URI)
+MONGO_DB = MONGO_CLIENT.Infer
+registered_apis = MONGO_DB.RegisteredAPIs
 
 options = {'fill_mask': ['gpt2'], #fill mask is weird because each one has a different mask token format.
            'text_classification': ['distilbert-base-uncased-finetuned-sst-2-english', 'cardiffnlp/twitter-roberta-base-sentiment-latest', 'madhurjindal/autonlp-Gibberish-Detector-492513457'],
@@ -27,6 +33,13 @@ options = {'fill_mask': ['gpt2'], #fill mask is weird because each one has a dif
            'object_detection': ['hustvl/yolos-tiny', 'hustvl/yolos-small', 'microsoft/table-transformer-detection', 'microsoft/table-transformer-structure-recognition', 'valentinafeve/yolos-fashionpedia'],
            'video_to_text_transcribe': ['assembly-ai']}
 
+valid_url = re.compile( # Only a little buggy
+        r'^(?:http|ftp)s?://' # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+        r'localhost|' #localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+        r'(?::\d+)?' # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
 HUGGING_API_URL_BASE = "https://api-inference.huggingface.co/models/"
 HUGGING_API_HEADERS = {"Authorization": f"Bearer {os.environ.get('HUGGING_TOKEN')}"}
@@ -38,17 +51,25 @@ def home(request):
     return render(request, 'api/home.html')
 
 # @cache_page(60 * 24)
-def upload(request):
-    return render(request, 'api/upload.html')
+def register(request):
+    return render(request, 'api/register.html')
 
-@api_view(['POST', 'GET']) #GET for now...
+@api_view(['POST'])
+def register_api(request): 
+    # registered_apis.insert_one({'url': 'test'})
+    if re.match(valid_url, request.data['url']) is not None:
+        registered_apis.insert_one({'url': request.data['url']})
+        return JsonResponse({"message": "Registered!"}, safe=False, status=status.HTTP_202_ACCEPTED)
+    return JsonResponse({"error": "Invalid URL"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)
+
+@api_view(['POST'])
 def inference(request):
 
     # Check how much memory is being used by a process, and unload old models from memory if necessary.
     process = psutil.Process()
     print(process.memory_info().rss) #in bytes
 
-@api_view(['POST', 'GET']) #GET for now...
+@api_view(['POST'])
 def proxy_inference(request):
 
 
@@ -56,8 +77,32 @@ def proxy_inference(request):
     # if cached:
     #     return JsonResponse(cached, safe=False, status=status.HTTP_200_OK)
 
-    data_type = 'image' # data_type = request.data['data_type']
+    #dont cache custom, they might want to change the model as if they are testing
+
+    # model = "microsoft/table-transformer-structure-recognition"
+    model = request.data['model']
+    # custom_model = "https://blabla.com"
+    custom_model = request.data['custom_model']
+
+    data_type = request.data['data_type']
     data = ''
+
+    if custom_model:
+        print('custom')
+        try:
+            data = requests.request("POST", custom_model, data=request.data['content'])
+            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+        except Exception:
+            return JsonResponse({"error": "Custom model did not work..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
+
+    if data_type == 'community':
+        print('community')
+        try:
+            data = requests.request("POST", model, data=request.data['content'])
+            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+        except Exception:
+            registered_apis.delete_one({'url': model})
+            return JsonResponse({"error": "Community model did not work, removing..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
     if data_type == 'video':
         try:
@@ -78,30 +123,25 @@ def proxy_inference(request):
         # data = {"inputs": "https://wordpress-live.heygrillhey.com/wp-content/uploads/2018/05/Smoked-Hamburgers-Feature-500x500.png"}
         data = {"inputs": request.data['content']}
 
-    # hugging_model = request.data['hugging'] #if request.data['hugging'] in options['text_generation'] else "gpt2"
+    # model = request.data['hugging'] #if request.data['hugging'] in options['text_generation'] else "gpt2"
     # proxy = request.data['proxy']
-
-    # hugging_model = "microsoft/table-transformer-structure-recognition"
-    hugging_model = request.data['hugging_model']
-    # custom_model = "https://blabla.com"
-    custom_model = request.data['custom_model']
 
     response = None
 
-    if hugging_model:
-        # inference = InferenceApi(hugging_model)
-        HUGGING_API_URL = HUGGING_API_URL_BASE + hugging_model
+    if model:
+        # inference = InferenceApi(model)
+        HUGGING_API_URL = HUGGING_API_URL_BASE + model
         try:
-            if hugging_model in options['fill_mask']:
+            if model in options['fill_mask']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data['inputs'])
             # response = inference(data)
-            elif hugging_model in options['text_classification']:
+            elif model in options['text_classification']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data)
-            elif hugging_model in options['image_to_text_description']:
+            elif model in options['image_to_text_description']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data['inputs'])
-            elif hugging_model in options['image_to_text_transcribe']:
+            elif model in options['image_to_text_transcribe']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data['inputs'])
-            elif hugging_model in options['object_detection']:
+            elif model in options['object_detection']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data['inputs'])
         except HTTPError as e:
             return JsonResponse({"error": e.response.text}, safe=False, status=status.HTTP_400_BAD_REQUEST)
@@ -120,13 +160,22 @@ def proxy_inference(request):
 def get_options(request):
     # allow user to do their own huggingface name / their own api
     # Register their app with CORS ALLOWED ORIGINS our domain....
+    # If a community doesn't work (because they removed it or whatever), delete from MongoDB
+    # ALlow them to give names to it. which is passed to the front and then u know search the names back up if the dataType is custom
+    community = []
+    for document in registered_apis.find().limit(200): #needs lazy loading
+        community.append(document['url'])
+    print(community)
+    # ({'url': request.data['url']})
+
     data = {
         'fill_mask': ' '.join(options['fill_mask']),
         'text_classification': ' '.join(options['text_classification']),
         'image_to_text_description': ' '.join(options['image_to_text_description']),
         'image_to_text_transcribe': ' '.join(options['image_to_text_transcribe']),
         'object_detection': ' '.join(options['object_detection']),
-        'video_to_text_transcribe': ' '.join(options['video_to_text_transcribe'])
+        'video_to_text_transcribe': ' '.join(options['video_to_text_transcribe']),
+        'community': ' '.join(community),
     }
     # 'fill_mask': ['gpt2'], #fill mask is weird because each one has a different mask token format.
     #        'text_classification': ['distilbert-base-uncased-finetuned-sst-2-english', 'cardiffnlp/twitter-roberta-base-sentiment-latest', 'madhurjindal/autonlp-Gibberish-Detector-492513457'],

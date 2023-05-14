@@ -85,7 +85,7 @@ window.onload = function() {
     }
     #copiedImage {
         width: auto;
-        max-height: 400px;
+        max-height: 330px;
         max-width: 330px;
     }
     .close {
@@ -145,6 +145,40 @@ window.onload = function() {
     .input_hide {
         display: none;
     }
+    .loader {
+        display: none;
+        margin: auto;
+        width: 48px;
+        height: 48px;
+        position: relative;
+      }
+      .loader::after,
+      .loader::before {
+        content: '';  
+        box-sizing: border-box;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid orange;
+        position: absolute;
+        left: 0;
+        top: 0;
+        animation: animloader 2s linear infinite;
+      }
+      .loader::after {
+        animation-delay: 1s;
+      }
+      
+      @keyframes animloader {
+        0% {
+          transform: scale(0);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 0;
+        }
+      }
     .send {
         background-color: white;
         padding: 2px;
@@ -203,6 +237,9 @@ window.onload = function() {
     }
     #model {
         margin-bottom: 4px;
+        display: block;
+        max-width: 330px;
+        margin: auto;
     }
     #modelType {
         margin-bottom: 4px;
@@ -212,7 +249,7 @@ window.onload = function() {
     }
     .output {
         margin-top: 12px;
-        display: block;
+        display: none;
         font-weight: bold;
         text-align: center;
         height: calc(100% - 24px);
@@ -227,6 +264,9 @@ window.onload = function() {
     }
     `;
 
+    const loader = document.createElement("span");
+    loader.setAttribute("class", "loader");
+
     // const title = document.createElement("div").setAttribute("class", "title");
     // shadowDom.appendChild(title); // Name, settings (models, command keys, settings, ui)
     const box = document.createElement("div");
@@ -236,7 +276,7 @@ window.onload = function() {
     
     const output = document.createElement("div");
     output.setAttribute("class", "output");
-    output.textContent = "Output Area Output AreaOutput Area Output AreaOutput Area Output Area Output Area Output Area Output Area Output Area Output Area Output Area Output Area Output Area  Output AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput AreaOutput Area "
+    output.textContent = ""
     
     const header = document.createElement("div");
     header.setAttribute("class", "header");
@@ -249,7 +289,7 @@ window.onload = function() {
     videoLink.setAttribute("class", "videoLink_2");
 
     const modelTypeSelection = document.createElement("div");
-    modelTypeSelection.innerHTML = '<label for="modelType">Model Type:</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select> <label for="model">Model:</label><select name="model" id="model"></select><label for="name">REST API:</label><input type="text" id="api" name="api" maxlength="100" size="48">';
+    modelTypeSelection.innerHTML = '<label for="modelType">Model Type:</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select> <label for="model">Model:</label><select name="model" id="model"></select><label for="name">REST API:</label><input type="text" id="api" name="api">';
     modelTypeSelection.setAttribute("class", "modelTypeSelection");
 
     const boy = document.createElement("div");
@@ -273,7 +313,8 @@ window.onload = function() {
     box.appendChild(boy);
     box.appendChild(modelTypeSelection);
     box.appendChild(output);
-
+    
+    box.appendChild(loader);
 
     const closeBtn = document.createElement("span");
     closeBtn.textContent = "X";
@@ -304,7 +345,7 @@ window.onload = function() {
                 const models = options[modelTypes[i]].split(' ');
                 let modelsHTML = '';
 
-                for(let j = 0; j < models.length; j++) {
+                for (let j = 0; j < models.length; j++) {
                  modelsHTML += '<option class="' + modelTypes[i] + '" value="' + models[j] + '">' + models[j] + '</option>';
                 }
                 modelTypeSelection.querySelector('#model').innerHTML += modelsHTML; 
@@ -329,7 +370,7 @@ window.onload = function() {
     window.addEventListener("keydown", function(e) {
         // console.log(e.metaKey);
         // if (e.key >= 65 && e.key <= 90) {
-        if(e.metaKey && e.key == 'a') { // Allow users to select what key to use, or automatically do it on active elements.
+        if(e.metaKey && e.key == 'd') { // Allow users to select what key to use, or automatically do it on active elements.
             e.preventDefault();
             let selectedText = getSelectionText();
             // if(selectedText != "") {
@@ -339,15 +380,17 @@ window.onload = function() {
             textArea.className = "input";
             videoLink.className = "videoLink_2";
             textArea.value = selectedText;
-
             modelTypeSelection.querySelector('#modelType').value = "fill_mask";
             dataType = "text";
             modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
         }
     });
-    window.addEventListener("click", function(e) { //For checking videos/images, any other way to find if the mouse is over an image/video?
+    window.addEventListener("contextmenu", function(e)  { //For checking videos/images, any other way to find if the mouse is over an image/video?
         if(e.metaKey) {
             if(e.altKey) { //Command + alt + click for videos.
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                e.stopPropagation();
                 let video;
                 if(e.target.tagName == "VIDEO") {
                     video = e.target;
@@ -362,7 +405,6 @@ window.onload = function() {
                     send.className = "send_video";
                     videoLink.className = "videoLink";
                     textArea.className = "input_hide";
-                    
                     videoLink.textContent = video.currentSrc;
                 }
                 else {
@@ -379,6 +421,9 @@ window.onload = function() {
                 modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
             }
             else if(e.shiftKey) { // Command + shift + click for images.
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
                 let image;
                 if(e.target.tagName == 'IMG') {
                     image = e.target;
@@ -424,16 +469,54 @@ window.onload = function() {
         box.className = "box_hide";
     });
 
+    // function convertBLOB(videoFile, videoEl) {
+
+    //     // Preconditions:
+    //     if( !( videoFile instanceof Blob ) ) throw new Error( '`videoFile` must be a Blob or File object.' ); // The `File` prototype extends the `Blob` prototype, so `instanceof Blob` works for both.
+    //     if( !( videoEl instanceof HTMLVideoElement ) ) throw new Error( '`videoEl` must be a <video> element.' );
+        
+    //     // 
+    //     const newObjectUrl = URL.createObjectURL( videoFile );
+            
+    //     // URLs created by `URL.createObjectURL` always use the `blob:` URI scheme: https://w3c.github.io/FileAPI/#dfn-createObjectURL
+    //     const oldObjectUrl = videoEl.currentSrc;
+    //     console.log(oldObjectUrl);
+    //     if( oldObjectUrl && oldObjectUrl.startsWith('blob:') ) {
+    //         // It is very important to revoke the previous ObjectURL to prevent memory leaks. Un-set the `src` first.
+    //         // See https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
+    
+    //         videoEl.src = ''; // <-- Un-set the src property *before* revoking the object URL.
+    //         URL.revokeObjectURL( oldObjectUrl );
+    //     }
+    
+    //     // Then set the new URL:
+    //     videoEl.src = newObjectUrl;
+    //     console.log(videoEl.src);
+
+    //     return(videoEl.src);
+    
+    //     // And load it:
+    //     // videoEl.load(); // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/load
+        
+    // }
+
     send.addEventListener('click', function handleClick(e) {
+        console.log("hello");
+        output.style.display = "none";
+        loader.style.display = "inline-block";
         textArea.disabled = true;
         let proxyInferenceRequest = new XMLHttpRequest();
         proxyInferenceRequest.onreadystatechange = function() {
-            console.log('HI');
-            if (this.readyState == 4 && this.status == 200) {
+            if (this.readyState == 4 && (this.status == 200 || this.status == 400)) {
                 console.log(proxyInferenceRequest.responseText);
+                output.textContent = proxyInferenceRequest.responseText;
+                output.style.display = "block";
+                loader.style.display = "none";
                 // if (JSON.parse(proxyInferenceRequest.responseText)["misinfo"]);
             }
             else {
+                output.style.display = "block";
+                loader.style.display = "none";
                 // HANDLE ERRORS HERE, USUALLY WAITING FOR MODEL TO SPIN UP 20 SECONDS
             }
             textArea.disabled = false;
@@ -451,8 +534,8 @@ window.onload = function() {
         else {
             data = videoLink.textContent;
         }
-        console.log(JSON.stringify({"hugging_model": modelTypeSelection.querySelector('#model').value, "custom_model": modelTypeSelection.querySelector('#api').value, "data_type": dataType, "content": data}));
-        proxyInferenceRequest.send(JSON.stringify({"hugging_model": modelTypeSelection.querySelector('#model').value, "custom_model": modelTypeSelection.querySelector('#api').value, "data_type": dataType, "content": data}));
+        console.log(JSON.stringify({"model": modelTypeSelection.querySelector('#model').value, "custom_model": modelTypeSelection.querySelector('#api').value, "data_type": dataType, "content": data}));
+        proxyInferenceRequest.send(JSON.stringify({"model": modelTypeSelection.querySelector('#model').value, "custom_model": modelTypeSelection.querySelector('#api').value, "data_type": dataType, "content": data}));
     });
 
     modelTypeSelection.querySelector('#modelType').addEventListener('input', function (event) {
@@ -462,10 +545,13 @@ window.onload = function() {
     // modelTypeSelection.querySelector('#modelType').addEventListener('onchange', modelTypeChanged(modelTypeSelection.querySelector('#modelType')));
 
     function modelTypeChanged(target) {
-        const textModels = ['fill_mask', 'text_classification'];
-        const imageModels = ['image_to_text_description', 'image_to_text_transcribe', 'object_detection'];
-        const videoModels = ['video_to_text_transcribe'];
+        const textModels = ['fill_mask', 'text_classification', 'community'];
+        const imageModels = ['image_to_text_description', 'image_to_text_transcribe', 'object_detection', 'community'];
+        const videoModels = ['video_to_text_transcribe', 'community'];
         let currentModelType = target.value;
+        if (currentModelType == 'community') {
+            dataType = 'community';
+        }
         let shown = null;
         if (textModels.includes(currentModelType)) {
             shown = textModels;

@@ -25,3 +25,5 @@ huggingface_hub
 redis
 redis-cli
 psutil
+pymongo==3.11
+dnspython
