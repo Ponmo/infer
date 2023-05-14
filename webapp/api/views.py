@@ -20,7 +20,7 @@ from huggingface_hub.inference_api import InferenceApi
 from pymongo.mongo_client import MongoClient
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 
 
 MONGO_URI = "mongodb+srv://second:" + os.environ.get('MONGO_PASSWORD') + "@mycluster.pgus5.mongodb.net/?retryWrites=true&w=majority"
@@ -57,7 +57,8 @@ def upload(request):
     return render(request, 'api/upload.html')
 
 @api_view(['POST'])
-@csrf_exempt #temporarily
+@ensure_csrf_cookie()
+# @csrf_exempt #temporarily
 def register_api(request):
     if registered_apis.count_documents({'url': request.data['url']}, limit = 1) > 0:
         return JsonResponse({"error": "Already registered"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)

@@ -41,6 +41,7 @@
                 <div class="box__error">Error! <span></span>.</div>
               </form>
               <div class="search">
+                {% csrf_token %}
                 <textarea name="input" id="input-area" type = "text" placeholder="Or register your API endpoint..."></textarea>
                 <button id="submit">Register</button>
             </div>
@@ -50,13 +51,16 @@
 
 <script>
     $(document).ready(function() {
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     $('#submit').click(function() {
         $("#input-area").css("border", "0px"); 
         $("#input-area").css("background-color", "white"); 
         $.ajax({
             type: "POST",
             url: "/register_api",
-            data: {csrfmiddlewaretoken: "{{ csrf_token }}", 'url': $('#input-area').val()},
+            headers: {'X-CSRFToken': csrftoken},
+            mode: 'same-origin',
+            data: {'url': $('#input-area').val()},
             success: function(data, textStatus, xhr) {
                 $("#input-area").css("border", "2px solid green"); 
                 $("#input-area").css("background-color", "#edfff1"); 
@@ -74,4 +78,22 @@
         });
     });
 });
+
+// function getCookie(name) {
+//     let cookieValue = null;
+//     if (document.cookie && document.cookie !== '') {
+//         const cookies = document.cookie.split(';');
+//         for (let i = 0; i < cookies.length; i++) {
+//             const cookie = cookies[i].trim();
+//             // Does this cookie string begin with the name we want?
+//             if (cookie.substring(0, name.length + 1) === (name + '=')) {
+//                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+//                 break;
+//             }
+//         }
+//     }
+//     return cookieValue;
+// }
+// const csrftoken = getCookie('csrftoken');
+
 </script>
