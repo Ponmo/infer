@@ -49,12 +49,12 @@ ASSEMBLY_TOKEN = os.environ.get('ASSEMBLY_TOKEN')
 ASSEMBLY_TRANSCRIPT_ENDPOINT = "https://api.assemblyai.com/v2/transcript"
 
 @cache_page(60 * 24)
-@ensure_csrf_cookie()
+# @ensure_csrf_cookie()
 def home(request):
     return render(request, 'api/home.html')
 
 @cache_page(60 * 24)
-@ensure_csrf_cookie()
+# @ensure_csrf_cookie()
 def upload(request):
     return render(request, 'api/upload.html')
 
