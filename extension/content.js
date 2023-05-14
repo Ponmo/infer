@@ -49,6 +49,12 @@ window.onload = function() {
         width: 50px;
         border-radius: 100px;
     }
+    #logo2 {
+        content: url(chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/logo.png);
+        height: 44px;
+        width: 44px;
+        border-radius: 100px;
+    }
     .box_hide {
         cursor: pointer;
         background-image: linear-gradient(to bottom right, white, purple , green);
@@ -79,15 +85,16 @@ window.onload = function() {
         display: none;
     }
     .box_show {
-        color: black;
+        color: white;
         display: flex;
         flex-direction: column;
         background-repeat: no-repeat;
         font-family: Arial, sans-serif;
         visibility: visible;
-        background-position: center;
+        background-position: 50% 200%;
         text-align: center;
         padding: 0px;
+        padding-bottom: 12px;
         position: fixed;
         width: 350px;
         height: 600px;
@@ -97,17 +104,19 @@ window.onload = function() {
         bottom: 0px;
         border: 1px solid black;
         font-size: 14px;
-        background-color: white;
+        background-color: black;;
+        background-image: url(chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/back.png);
     }
     @-webkit-keyframes fadeIn {
         from {opacity: 0;}
         to {opacity: 1;}
     }
     input {
+        padding-left: 4px;
         line-height: 22px;
     padding: 0px 14px;
     width: 100%;
-    min-height: 44px;
+    min-height: 36px;
     border: unset;
     border-radius: 4px;
     outline-color: rgb(84 105 212 / 0.5);
@@ -120,6 +129,10 @@ window.onload = function() {
                     rgba(0, 0, 0, 0) 0px 0px 0px 0px, 
                     rgba(0, 0, 0, 0) 0px 0px 0px 0px;
     }
+    input::placeholder {
+        opacity: 0.8;
+        color: white;
+    }
     
     @keyframes fadeIn {
         from {opacity: 0;}
@@ -127,7 +140,7 @@ window.onload = function() {
     }
     #copiedImage {
         width: auto;
-        max-height: 330px;
+        max-height: 270px;
         max-width: 330px;
     }
     .close {
@@ -141,19 +154,20 @@ window.onload = function() {
     
     .close:hover,
     .close:focus {
-        color: black;
+        color: #959595;
         text-decoration: none;
         cursor: pointer;
     }
     .header {
         text-align: left;
-        min-height: 38px;
+        min-height: 50px;
         width: auto;
-        padding: 14px;
+        padding: 9px;
         padding-bottom: 0px;
         font-size: 22px;
         font-weight: bold;
         border-bottom: 1px solid gray;
+        display: flex;
     }
     .boy {
         position: relative;
@@ -163,9 +177,10 @@ window.onload = function() {
         
     }
     .titular {
+        padding-top: 6px;
         padding-left: 8px;
         font-size: 24px;
-        color: black;
+        color: white;
     }
     ::-webkit-scrollbar {
         width: 4px;
@@ -173,6 +188,7 @@ window.onload = function() {
     
     .input {
         overflow-x: scroll;
+        color: black;
         width: auto;
         padding-right: 30px;
         width: calc(100% - 30px);
@@ -180,6 +196,7 @@ window.onload = function() {
         resize: none;
         margin-bottom: 0px;
         padding-bottom: 0px;
+        background-color: white;
         display: block;
     }
     .input_hide {
@@ -221,15 +238,15 @@ window.onload = function() {
       }
     .send {
         background-color: white;
-        padding: 2px;
-        border-radius: 2px;
-        position: absolute;
-        cursor: pointer;
-        bottom: 16px;
-        right: 12px;
-        height: 25px;
-        width: 25px;
-        content:url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/send.png');
+    padding: 2px;
+    border-radius: 2px;
+    position: absolute;
+    cursor: pointer;
+    bottom: 15px;
+    right: 15px;
+    height: 25px;
+    width: 25px;
+        content: url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/send.png');
     }
     .send_img {
         background-color: white;
@@ -238,7 +255,7 @@ window.onload = function() {
         border-radius: 2px;
         position: absolute;
         cursor: pointer;
-        bottom: 18px;
+        bottom: 12px;
         right: 12px;
         height: 25px;
         width: 25px;
@@ -275,19 +292,23 @@ window.onload = function() {
         margin-bottom: 0px;
         font-size: 16px;
     }
+    label {
+        padding-right: 5px;
+    }
     #model {
         margin-bottom: 4px;
-        width: 293px;
+        width: 292px;
     }
     #modelType {
+        width: 257px;
         margin-bottom: 4px;
     }
     #api {
-        width: 312px;
-    margin: auto;
-    color: white;
-    margin-bottom: 4px;
-    background-color: #1F99CD;
+        width: 255px;
+        margin: auto;
+        color: white;
+        margin-bottom: 4px;
+        background-color: #1F99CD;
     }
     .output {
         margin-top: 12px;
@@ -303,9 +324,13 @@ window.onload = function() {
         font-size: 16px;
         overflow-y: scroll;
         overflow-x: hidden;
+        padding-bottom: 12px;
     }
     #custom {
         margin-bottom:4px;
+    }
+    .setting {
+
     }
     `;
 
@@ -328,13 +353,18 @@ window.onload = function() {
 
     const title = document.createElement("div");
     title.setAttribute("class", "titular");
-    title.textContent = "Inferencienzia";
+    title.textContent = "Octobazooka";
+
+    const setting = document.createElement("div");
+    setting.setAttribute("class", "settings");
+    setting.textContent = "Settings";
+
 
     const videoLink = document.createElement("div");
     videoLink.setAttribute("class", "videoLink_2");
 
     const modelTypeSelection = document.createElement("div");
-    modelTypeSelection.innerHTML = '<label for="modelType">Model Type:</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select><br><label for="model">Model:</label><select name="model" id="model"></select><label for="name" id="custom">Custom:</label><input placeholder="Input your own Developer REST API" type="text" id="api" name="api">';
+    modelTypeSelection.innerHTML = '<label for="modelType">Model Type</label><select name="modelType" id="modelType"><option value="volvo">Volvo</option><option value="saab">Saab</option><option value="mercedes">Mercedes</option><option value="audi">Audi</option></select><br><label for="model">Model</label><select name="model" id="model"></select><label for="name" id="custom">Custom</label><input placeholder="Or use your own API endpoint..." type="text" id="api" name="api">';
     modelTypeSelection.setAttribute("class", "modelTypeSelection");
 
     const boy = document.createElement("div");
@@ -361,10 +391,15 @@ window.onload = function() {
     
     box.appendChild(loader);
 
+    const logo2 = document.createElement("img");
+    logo2.setAttribute("id", "logo2");
+
     const closeBtn = document.createElement("span");
     closeBtn.textContent = "X";
     closeBtn.setAttribute("class", "close"); 
+    header.append(logo2);
     header.append(title);
+    header.append(setting);
     header.appendChild(closeBtn);
 
 
@@ -576,7 +611,7 @@ window.onload = function() {
         else if (dataType=='image') {
             data = boy.querySelector("#copiedImage").src;
         }
-        else {
+        else if (dataType == 'video') {
             data = videoLink.textContent;
         }
         console.log(JSON.stringify({"model": modelTypeSelection.querySelector('#model').value, "custom_model": modelTypeSelection.querySelector('#api').value, "data_type": dataType, "content": data}));
@@ -594,9 +629,9 @@ window.onload = function() {
         const imageModels = ['image_to_text_description', 'image_to_text_transcribe', 'object_detection', 'community'];
         const videoModels = ['video_to_text_transcribe', 'community'];
         let currentModelType = target.value;
-        if (currentModelType == 'community') {
-            dataType = 'community';
-        }
+        // if (currentModelType == 'community') {
+        //     dataType = 'community';
+        // }
         let shown = null;
         if (textModels.includes(currentModelType)) {
             shown = textModels;

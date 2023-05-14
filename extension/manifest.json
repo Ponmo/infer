@@ -25,7 +25,10 @@
   "web_accessible_resources": [{
     "resources": ["images/logo.png",
   "images/send.png",
-  "images/background.png"],
+  "images/background2.png",
+  "images/background3.png",
+  "images/octo.png",
+"images/back.png"],
     "matches": ["<all_urls>"]
   }],
 

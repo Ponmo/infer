@@ -18,8 +18,8 @@ import requests
 from requests.exceptions import HTTPError
 from huggingface_hub.inference_api import InferenceApi
 from pymongo.mongo_client import MongoClient
-# from django.views.decorators.cache import cache_page
-# from django.core.cache import cache
+from django.views.decorators.cache import cache_page
+from django.core.cache import cache
 
 MONGO_URI = "mongodb+srv://second:" + os.environ.get('MONGO_PASSWORD') + "@mycluster.pgus5.mongodb.net/?retryWrites=true&w=majority"
 MONGO_CLIENT = MongoClient(MONGO_URI)
@@ -46,19 +46,31 @@ HUGGING_API_HEADERS = {"Authorization": f"Bearer {os.environ.get('HUGGING_TOKEN'
 ASSEMBLY_TOKEN = os.environ.get('ASSEMBLY_TOKEN')
 ASSEMBLY_TRANSCRIPT_ENDPOINT = "https://api.assemblyai.com/v2/transcript"
 
-# @cache_page(60 * 24)
+@cache_page(60 * 24)
 def home(request):
     return render(request, 'api/home.html')
 
-# @cache_page(60 * 24)
+@cache_page(60 * 24)
 def upload(request):
     return render(request, 'api/upload.html')
 
 @api_view(['POST'])
-def register_api(request): 
-    # registered_apis.insert_one({'url': 'test'})
+def register_api(request):
+    if registered_apis.count_documents({'url': request.data['url']}, limit = 1) > 0:
+        return JsonResponse({"error": "Already registered"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)
+
     if re.match(valid_url, request.data['url']) is not None:
+
+        try:
+            data = requests.post(request.data['url'], data={'inputs': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Hamburger_%28black_bg%29.jpg/640px-Hamburger_%28black_bg%29.jpg'})
+        except HTTPError as e:
+            try:
+                data = requests.post(request.data['url'], data={'inputs': 'I fell in love with the world right when I was [MASK] <MASK> (MASK)'})
+            except HTTPError as e:
+                return JsonResponse({"error": "Test requests failed"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)
+
         registered_apis.insert_one({'url': request.data['url']})
+
         return JsonResponse({"message": "Registered!"}, safe=False, status=status.HTTP_202_ACCEPTED)
     return JsonResponse({"error": "Invalid URL"}, safe=False, status=status.HTTP_406_NOT_ACCEPTABLE)
 
@@ -73,68 +85,55 @@ def inference(request):
 def proxy_inference(request):
 
 
-    # cached = cache.get(str(request.data))
-    # if cached:
-    #     return JsonResponse(cached, safe=False, status=status.HTTP_200_OK)
+    cached = cache.get(str(request.data))
+    if cached:
+        return JsonResponse(cached, safe=False, status=status.HTTP_200_OK)
 
-    #dont cache custom or community, they might want to change the model
+    # dont cache custom or community in production, they might want to change the model for testing
 
-    # model = "microsoft/table-transformer-structure-recognition"
     model = request.data['model']
-    # custom_model = "https://blabla.com"
     custom_model = request.data['custom_model']
-
     data_type = request.data['data_type']
     data = ''
 
     if custom_model:
-        print('custom')
         try:
-            data = requests.request("POST", custom_model, data=request.data['content'])
-            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+            data = requests.post(custom_model, data={'inputs': request.data['content']})
+            cache.set(str(request.data), data)
+            return JsonResponse(data.text, safe=False, status=status.HTTP_200_OK)
         except Exception:
             return JsonResponse({"error": "Custom model did not work..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
-    if data_type == 'community':
-        print('community')
+    if model.startswith('http'):
         try:
-            data = requests.request("POST", model, data=request.data['content'])
-            return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
+            data = requests.post(model, data={'inputs': request.data['content']})
+            cache.set(str(request.data), data)
+            return JsonResponse(data.text, safe=False, status=status.HTTP_200_OK)
         except Exception:
             registered_apis.delete_one({'url': model})
             return JsonResponse({"error": "Community model did not work, removing..."}, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
     if data_type == 'video':
         try:
-            # data = {"transcription": transcribe_video()}
             data = {"transcription": transcribe_video(request.data['content'])}
-            # cache.set(str(request.data), data)
+            cache.set(str(request.data), data)
             return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
         except HTTPError as e:
             return JsonResponse({"error": e.response.text}, safe=False, status=status.HTTP_400_BAD_REQUEST)
 
-        # data = {"inputs": transcribe_video(request.data['content'])}
-
     if data_type == 'text':
-        # data = {"inputs": "I hate it when you come home a "} 
         data = {"inputs": request.data['content']}
 
     if data_type == 'image':
-        # data = {"inputs": "https://wordpress-live.heygrillhey.com/wp-content/uploads/2018/05/Smoked-Hamburgers-Feature-500x500.png"}
         data = {"inputs": request.data['content']}
-
-    # model = request.data['hugging'] #if request.data['hugging'] in options['text_generation'] else "gpt2"
-    # proxy = request.data['proxy']
 
     response = None
 
     if model:
-        # inference = InferenceApi(model)
         HUGGING_API_URL = HUGGING_API_URL_BASE + model
         try:
             if model in options['fill_mask']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data['inputs'])
-            # response = inference(data)
             elif model in options['text_classification']:
                 response = requests.request("POST", HUGGING_API_URL, headers=HUGGING_API_HEADERS, data=data)
             elif model in options['image_to_text_description']:
@@ -148,11 +147,11 @@ def proxy_inference(request):
         
     elif custom_model:
         try:
-            response = requests.request("POST", custom_model, data=data['inputs'])
+            response = requests.request("POST", custom_model, data = data['inputs'])
         except HTTPError as e:
             return JsonResponse({"error": e.response.text}, safe=False, status=status.HTTP_400_BAD_REQUEST)
         
-    # cache.set(str(request.data), json.loads(response.content.decode("utf-8")))
+    cache.set(str(request.data), json.loads(response.content.decode("utf-8")))
 
     return JsonResponse(json.loads(response.content.decode("utf-8")), safe=False, status=status.HTTP_200_OK)
 
@@ -162,6 +161,7 @@ def get_options(request):
     # Register their app with CORS ALLOWED ORIGINS our domain....
     # If a community doesn't work (because they removed it or whatever), delete from MongoDB
     # ALlow them to give names to it. which is passed to the front and then u know search the names back up if the dataType is custom
+    # rank by most popular?
     community = []
     for document in registered_apis.find().limit(200): #needs lazy loading
         community.append(document['url'])
@@ -192,7 +192,7 @@ def get_options(request):
     return response
     
 
-def transcribe_video(url='https://video.twimg.com/ext_tw_video/1379732959234826242/pu/vid/576x1082/7KzYeEtZMmYGK6bN.mp4'):
+def transcribe_video(url):
 
     # Create header with authorization along with content-type
     header = {

@@ -137,14 +137,14 @@ ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379",
-#         "TIMEOUT": 86400,
-#         # "OPTIONS": {
-#         #     # "MAX_ENTRIES": 1000,
-#         #     "CULL_FREQUENCY": 3,
-#         # }
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+        "TIMEOUT": 86400,
+        # "OPTIONS": {
+        #     # "MAX_ENTRIES": 1000,
+        #     "CULL_FREQUENCY": 3,
+        # }
+    }
+}
