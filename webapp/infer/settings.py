@@ -170,7 +170,7 @@ SOCIALACCOUNT_PROVIDERS = {
 }
 
 SITE_ID = 3
-LOGIN_REDIRECT_URL = 'https://octobazooka.store/accounts/google/login/callback/'
+LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000,', 'https://octobazooka.store']
