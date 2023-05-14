@@ -13,7 +13,8 @@ window.onload = function() {
     // Create some CSS to apply to the shadow DOM
     let style = document.createElement("style"); 
 
-    // console.log(chrome.runtime.getURL("images/send.png"));
+    console.log(chrome.runtime.getURL("images/send.png").substring(19, 51));
+    let localImageKey = chrome.runtime.getURL("images/send.png").substring(19, 51);
     
     //TODO: MUST INCLUDE LOGO ICON IN BOTTOM RIGHT CORNER + BACKGROUND PICTURE WITH ANIMATION.
     style.textContent = `
@@ -44,13 +45,13 @@ window.onload = function() {
       }
 
     #logo {
-        content:url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/logo.png');
+        content:url('chrome-extension://` + localImageKey + `/images/logo.png');
         height: 50px;
         width: 50px;
         border-radius: 100px;
     }
     #logo2 {
-        content: url(chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/logo.png);
+        content: url(chrome-extension://` + localImageKey + `/images/logo.png);
         height: 44px;
         width: 44px;
         border-radius: 100px;
@@ -106,7 +107,7 @@ window.onload = function() {
         border: 1px solid black;
         font-size: 14px;
         background-color: black;;
-        background-image: url(chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/back.png);
+        background-image: url(chrome-extension://` + localImageKey + `/images/back.png);
     }
     @-webkit-keyframes fadeIn {
         from {opacity: 0;}
@@ -246,7 +247,7 @@ window.onload = function() {
     right: 15px;
     height: 25px;
     width: 25px;
-        content: url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/send.png');
+        content: url('chrome-extension://` + localImageKey + `/images/send.png');
     }
     .send_img {
         background-color: white;
@@ -259,7 +260,7 @@ window.onload = function() {
         right: 12px;
         height: 25px;
         width: 25px;
-        content:url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/send.png');
+        content:url('chrome-extension://` + localImageKey + `/images/send.png');
     }
     .send_video {
         position: absolute;
@@ -268,7 +269,7 @@ window.onload = function() {
         right: 10px;
         height: 25px;
         width: 25px;
-        content:url('chrome-extension://clblmpgkdonkpjihkgnjegdceellgihb/images/send.png');
+        content:url('chrome-extension://` + localImageKey + `/images/send.png');
     }
     .videoLink {
         display: block;
@@ -499,6 +500,10 @@ window.onload = function() {
                     videoLink.className = "videoLink";
                     textArea.className = "input_hide";
                     videoLink.textContent = video.currentSrc;
+
+                    modelTypeSelection.querySelector('#modelType').value = "video_to_text_transcribe";
+                    dataType = "video";
+                    modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
                 }
                 else {
                     box.className = "box_show";
@@ -507,11 +512,12 @@ window.onload = function() {
                     textArea.className = "input";
                     boy.querySelector("#copiedImage")?.remove();
                     textArea.value = "Could not find video D:";
+
+                    modelTypeSelection.querySelector('#modelType').value = "fill_mask";
+                    dataType = "text";
+                    modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
                 }
                 
-                modelTypeSelection.querySelector('#modelType').value = "video_to_text_transcribe";
-                dataType = "video";
-                modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
             }
             else if(e.shiftKey) { // Command + shift + click for images.
                 e.preventDefault();
@@ -534,6 +540,10 @@ window.onload = function() {
                     send.className = "send_img";
                     videoLink.className = "videoLink_2";
                     textArea.className = "input_hide";
+
+                    modelTypeSelection.querySelector('#modelType').value = "image_to_text_description";
+                    dataType = "image";
+                    modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
                 }
                 else {
                     box.className = "box_show";
@@ -542,11 +552,11 @@ window.onload = function() {
                     boy.querySelector("#copiedImage")?.remove();
                     textArea.className = "input"
                     textArea.value = "Could not find image D:";
+                    
+                    modelTypeSelection.querySelector('#modelType').value = "fill_mask";
+                    dataType = "text";
+                    modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
                 }
-                
-                modelTypeSelection.querySelector('#modelType').value = "image_to_text_description";
-                dataType = "image";
-                modelTypeChanged(modelTypeSelection.querySelector('#modelType'))
             }
             
         }

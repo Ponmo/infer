@@ -20,6 +20,8 @@ from huggingface_hub.inference_api import InferenceApi
 from pymongo.mongo_client import MongoClient
 from django.views.decorators.cache import cache_page
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
+
 
 MONGO_URI = "mongodb+srv://second:" + os.environ.get('MONGO_PASSWORD') + "@mycluster.pgus5.mongodb.net/?retryWrites=true&w=majority"
 MONGO_CLIENT = MongoClient(MONGO_URI)
@@ -54,6 +56,7 @@ def home(request):
 def upload(request):
     return render(request, 'api/upload.html')
 
+@csrf_exempt #temporarily
 @api_view(['POST'])
 def register_api(request):
     if registered_apis.count_documents({'url': request.data['url']}, limit = 1) > 0:
@@ -81,6 +84,7 @@ def inference(request):
     process = psutil.Process()
     print(process.memory_info().rss) #in bytes
 
+@csrf_exempt #temporarily
 @api_view(['POST'])
 def proxy_inference(request):
 
@@ -127,6 +131,8 @@ def proxy_inference(request):
         data = {"inputs": request.data['content']}
 
     if data_type == 'image':
+        if request.data['content'].length > 300:
+            return JsonResponse({"error": "Image too large (base64?)"}, safe=False, status=status.HTTP_400_BAD_REQUEST)
         data = {"inputs": request.data['content']}
 
     response = None
