@@ -1,0 +1,32 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Infer</title>
+        <link rel="stylesheet" href="{% static 'api/home.css' %}">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <!-- <script type="text/javascript" src="{% static 'firstapp/script.js' %}"></script> -->
+    </head>
+    <body>
+        <!-- <img id="background" src="{% static 'firstapp/images/back.png' %}"> -->
+        <div class="header">
+            <div class="headerLeft">
+                <!-- <img class="logo-white" src="{% static 'firstapp/images/logowhite.svg' %}"> -->
+                <div class="name"><a href="/">Infer</a></div>
+            </div>
+
+            <div class="headerRight">
+                <div class="headerLink"><a href="">Extension</a></div>
+                <div class="headerLink"><a href="/upload">Upload Model</a></div>
+                <div class="headerLink"><a href="">Logout</a></div>
+            </div>
+        </div>
+        <div class="center">
+            <div class="declaration">Inference for Everyone</div> <!--highlight which-->
+            <div class="description">Have fun testing your ML/AI model wherever you browse!</div>
+        </div>
+        <img class="main-image" src="{% static 'firstapp/images/work.svg' %}">
+        <img class="mobile-image" src="{% static 'firstapp/images/work.svg' %}">
+    </body>
+</html>
