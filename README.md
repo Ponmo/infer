@@ -1,4 +1,4 @@
-__OCTOBAZOOKA__
+##OCTOBAZOOKA
 
 **Using the Extension:**
 
