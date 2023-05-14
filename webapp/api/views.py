@@ -61,7 +61,8 @@ def proxy_inference(request):
 
     if data_type == 'video':
         try:
-            data = {"transcription": transcribe_video()}
+            # data = {"transcription": transcribe_video()}
+            data = {"transcription": transcribe_video(request.data['content'])}
             # cache.set(str(request.data), data)
             return JsonResponse(data, safe=False, status=status.HTTP_200_OK)
         except HTTPError as e:
@@ -70,18 +71,20 @@ def proxy_inference(request):
         # data = {"inputs": transcribe_video(request.data['content'])}
 
     if data_type == 'text':
-        data = {"inputs": "I hate it when you come home a "} 
-        # data = {"inputs": request.data['content']}
+        # data = {"inputs": "I hate it when you come home a "} 
+        data = {"inputs": request.data['content']}
 
     if data_type == 'image':
-        data = {"inputs": "https://wordpress-live.heygrillhey.com/wp-content/uploads/2018/05/Smoked-Hamburgers-Feature-500x500.png"}
-        # data = {"inputs": request.data['content']}
+        # data = {"inputs": "https://wordpress-live.heygrillhey.com/wp-content/uploads/2018/05/Smoked-Hamburgers-Feature-500x500.png"}
+        data = {"inputs": request.data['content']}
 
     # hugging_model = request.data['hugging'] #if request.data['hugging'] in options['text_generation'] else "gpt2"
     # proxy = request.data['proxy']
 
-    hugging_model = "microsoft/table-transformer-structure-recognition" # request.data['hugging_model']
-    custom_model = "https://blabla.com" #request.data['custom_model']
+    # hugging_model = "microsoft/table-transformer-structure-recognition"
+    hugging_model = request.data['hugging_model']
+    # custom_model = "https://blabla.com"
+    custom_model = request.data['custom_model']
 
     response = None
 
